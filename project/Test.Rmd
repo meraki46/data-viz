@@ -1,0 +1,106 @@
+
+
+
+
+# Create a new quarto project
+quarto::quarto_create("my_interactive_report")
+
+# Create a new markdown file for the report
+quarto::quarto_new("my_interactive_report.Rmd")
+
+# My Interactive Quarto Report
+
+This is an example of an interactive quarto report.
+
+## Interactive Plot
+
+```{r}
+# R code chunk for creating an interactive plot with plotly
+library(plotly)
+
+data1<-read.csv("unicef_indicator_1.csv")
+data2<-read.csv("unicef_indicator_2.csv")
+# Create an example dataset
+data <- data.frame(
+  x = c(1, 2, 3, 4, 5),
+  y = c(10, 11, 12, 13, 14)
+)
+
+# Create a plotly plot
+plot <- plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines+markers")
+
+# Add interactive features
+plot <- plot %>% 
+  layout(title = "Interactive Line Plot",
+         xaxis = list(title = "X-axis Label"),
+         yaxis = list(title = "Y-axis Label"))
+
+# Render the plot
+plot
+
+# R code chunk for creating an interactive table with DT
+library(DT)
+
+# Create an example dataset
+data <- data.frame(
+  Name = c("John", "Alice", "Bob", "Charlie"),
+  Age = c(25, 30, 28, 35),
+  Gender = c("Male", "Female", "Male", "Male")
+)
+
+# Create a DT datatable
+datatable(data, options = list(pageLength = 5), rownames = FALSE)
+
+
+
+
+```
+
+
+```{r}
+library(png)
+
+# Read PNG image file
+image <- readPNG("MT5000.png")
+
+# Display the image
+plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", ann = FALSE)
+rasterImage(image, 0, 0, 1, 1)
+
+
+```
+
+
+
+
+```{r}
+library(ggplot2)
+
+data_Bhutan<-subset(data1,country=="Bhutan")
+# Create the plot object
+plot <- ggplot(data = data_Bhutan)
+
+
+# Add the bar chart layer with customized labels
+plot +
+  geom_bar(aes(x = time_period , y = obs_value), stat = "identity", fill = "Blue" ) +
+  labs(title = "Bhutan Sewage Time Series", x = "Observed Values", y = "Time Period") +
+  theme_minimal()
+```
+
+```{r}
+library(ggplot2)
+country_name <- readline(prompt = "Enter country name: ")
+
+data2_Bhutan<-subset(data2,country==country_name)
+# Create the plot object
+plot <- ggplot(data = data2_Bhutan)
+
+
+# Add the bar chart layer with customized labels
+plot +
+  geom_bar(aes(x = time_period , y = obs_value), stat = "identity", fill = "Pink" ) +
+  labs(title = "Observed Values by Time Period", x = "Observed Values", y = "Time Period") +
+  theme_minimal()
+```
+
