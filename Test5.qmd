@@ -1,0 +1,420 @@
+---
+title: "MT5000 Assignment"
+format: html
+runtime: shiny
+output:
+  html_document:
+    runtime: shiny
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+
+
+```{r}
+library(png)
+
+# Read PNG image file
+image <- readPNG("MT5000.png")
+
+# Display the image
+plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", ann = FALSE)
+rasterImage(image, 0, 0, 1, 1)
+
+
+```
+
+```{r}
+# Load required packages
+library(plotly)
+library(readr)
+
+# Read the CSV file into a data frame
+data <- read_csv("unicef_metadata1.csv")
+
+# Create an interactive world map with plotly
+plot_ly(data, type = "scattergeo", 
+        locations = ~alpha_3_code, 
+        hoverinfo = "text", 
+        text = ~paste("Country: ", country, "<br>",
+                      "Population: ", population, "<br>",
+                      "GDP: $", gdp, "<br>",
+                      "Inflation: ", inflation, "%"), 
+        marker = list(size = 10, color = "blue")) %>%
+  layout(title = "Interactive World Map", 
+         geo = list(showcountries = TRUE))
+
+
+```
+```{r}
+# Read the CSV file
+unicef_data <- read.csv("unicef_indicator_1.csv", header = TRUE)
+
+# Get the unique alpha_3_code values
+unique_codes <- unique(unicef_data$alpha_3_code)
+
+# Create a table with 14 rows and 10 columns
+table_matrix <- matrix(unique_codes, nrow = 14, ncol = 10, byrow = TRUE)
+
+# Create a data frame from the table matrix
+table_df <- as.data.frame(table_matrix)
+
+# Print the table
+print(table_df)
+
+```
+
+```{r}
+library(shiny)
+library(ggplot2)
+
+# Read the data
+data <- read.csv("unicef_indicator_1.csv")
+
+# Define UI
+ui <- fluidPage(
+  
+  # Add a text input box for entering alpha_3_code
+  textInput("alpha3", label = "Enter alpha_3_code:", value = ""),
+  
+  # Add a plot output
+  plotOutput("myPlot")
+)
+
+# Define server
+server <- function(input, output) {
+  
+  # Create a reactive subset of the data based on the user input
+  subset_data <- reactive({
+    subset(data, alpha_3_code == input$alpha3)
+  })
+  
+  # Create the plot
+  output$myPlot <- renderPlot({
+    ggplot(subset_data(), aes(x = time_period, y = obs_value)) + 
+      geom_bar(stat = "identity") +
+      labs(title = paste0("obs_value for ", input$alpha3),
+           x = "Time Period",
+           y = "Observed Value")
+  })
+}
+
+# Run the app
+shinyApp(ui = ui, server = server)
+
+```
+
+
+
+```{r}
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(DT)
+
+# Load data from CSV file
+data <- read.csv("unicef_indicator_1.csv")
+
+# Create a table of alpha_3_code using DT package
+alpha3_table <- datatable(data %>% select(alpha_3_code) %>% unique())
+
+# Define the UI for the Shiny app
+ui <- fluidPage(
+  # Search bar for alpha_3_code
+  sidebarLayout(
+    sidebarPanel(
+      textInput("alpha3_search", "Enter alpha_3_code:")
+    ),
+    # Output plot
+    mainPanel(
+      plotOutput("barplot")
+    )
+  ),
+  # Output table
+  fluidRow(
+    column(12, alpha3_table)
+  )
+)
+
+# Define the server for the Shiny app
+server <- function(input, output) {
+  
+  # Filter data based on input value from search bar
+  filtered_data <- reactive({
+    if (input$alpha3_search == "") {
+      data
+    } else {
+      data %>% filter(alpha_3_code == input$alpha3_search)
+    }
+  })
+  
+  # Create bar chart based on filtered data
+  output$barplot <- renderPlot({
+    ggplot(filtered_data(), aes(x = time_period, y = obs_value)) +
+      geom_bar(stat = "identity") +
+      labs(title = paste("Observed Values for Alpha_3_Code:", input$alpha3_search),
+           x = "Time Period", y = "Observed Value")
+  })
+}
+
+# Run the Shiny app
+shinyApp(ui, server)
+
+```
+
+```{r}
+# Load data from CSV file
+data <- read.csv("unicef_indicator_1.csv")
+
+# Create a table of alpha_3_code and country using DT package
+alpha3_table <- datatable(data %>% select(alpha_3_code, country) %>% unique())
+
+# Define the UI for the Shiny app
+ui <- fluidPage(
+  # Search bar for alpha_3_code
+  sidebarLayout(
+    sidebarPanel(
+      textInput("alpha3_search", "Enter alpha_3_code:")
+    ),
+    # Output plot
+    mainPanel(
+      plotOutput("barplot")
+    )
+  ),
+  # Output table
+  fluidRow(
+    column(12, alpha3_table)
+  )
+)
+
+# Define the server for the Shiny app
+server <- function(input, output) {
+  
+  # Filter data based on input value from search bar
+  filtered_data <- reactive({
+    if (input$alpha3_search == "") {
+      data
+    } else {
+      data %>% filter(alpha_3_code == input$alpha3_search)
+    }
+  })
+  
+  # Create bar chart based on filtered data
+  output$barplot <- renderPlot({
+    ggplot(filtered_data(), aes(x = time_period, y = obs_value)) +
+      geom_bar(stat = "identity") +
+      labs(title = paste("Observed Values for Alpha_3_Code:", input$alpha3_search),
+           x = "Time Period", y = "Observed Value")
+  })
+}
+
+# Run the Shiny app
+shinyApp(ui, server)
+
+```
+
+```{r}
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(DT)
+
+# Load data from CSV file
+data <- read.csv("unicef_indicator_1.csv")
+
+# Create a table of alpha_3_code using DT package
+alpha3_table <- datatable(data %>% select(alpha_3_code) %>% unique())
+
+# Define the UI for the Shiny app
+ui <- fluidPage(
+  # Search bar for alpha_3_code
+  sidebarLayout(
+    sidebarPanel(
+      textInput("alpha3_search", "Enter alpha_3_code:")
+    ),
+    # Output plot
+    mainPanel(
+      plotOutput("scatterplot")
+    )
+  ),
+  # Output table
+  fluidRow(
+    column(12, alpha3_table)
+  )
+)
+
+# Define the server for the Shiny app
+server <- function(input, output) {
+  
+  # Filter data based on input value from search bar
+  filtered_data <- reactive({
+    if (input$alpha3_search == "") {
+      data
+    } else {
+      data %>% filter(alpha_3_code == input$alpha3_search)
+    }
+  })
+  
+  # Create scatterplot with linear regression line based on filtered data
+  output$scatterplot <- renderPlot({
+    ggplot(filtered_data(), aes(x = time_period, y = obs_value)) +
+      geom_point() +
+      geom_smooth(method = "lm", se = FALSE, color = "red") +
+      labs(title = paste("Observed Values for Alpha_3_Code:", input$alpha3_search),
+           x = "Time Period", y = "Observed Value")
+  })
+}
+
+# Run the Shiny app
+shinyApp(ui, server)
+
+```
+
+
+
+```{r}
+library(shiny)
+library(ggpubr)
+
+# Read the data
+data <- read.csv("unicef_indicator_2.csv")
+
+# Define UI
+ui <- fluidPage(
+  
+  # Add a text input box for entering alpha_3_code
+  textInput("alpha3", label = "Enter alpha_3_code:", value = ""),
+  
+  # Add a plot output
+  plotOutput("myPlot")
+)
+
+# Define server
+server <- function(input, output) {
+  
+  # Create a reactive subset of the data based on the user input
+  subset_data <- reactive({
+    subset(data, alpha_3_code == input$alpha3)
+  })
+  
+  # Create the plot
+  output$myPlot <- renderPlot({
+    ggscatterhist(subset_data(), x = "time_period", y = "obs_value", 
+                  color = "sex", size = 3, alpha = 0.6,
+                  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+                  margin.params = list(fill = "sex", color = "black", size = 0.2)
+    )
+  })
+}
+
+# Run the app
+shinyApp(ui = ui, server = server)
+
+```
+
+
+
+
+```{r}
+library(ggpubr)
+library(dplyr)
+
+# Load data
+unicef_data <- read.csv("unicef_indicator_2.csv")
+
+# Choose a specific country
+selected_country <- "India"
+data_country <- unicef_data %>% filter(country == selected_country)
+
+# Grouped Scatter plot with marginal density plots for sex column
+ggscatterhist(
+  data_country, x = "time_period", y = "obs_value",
+  color = "sex", size = 3, alpha = 0.6,
+  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+  margin.params = list(fill = "sex", color = "black", size = 0.2)
+)
+
+```
+
+```{r}
+library(ggplot2)
+library(mapdata)
+
+# Read in the data
+data <- read.csv("unicef_metadata1.csv")
+
+# Use map_data to get the world map data
+world_map <- map_data("world")
+
+# Merge the data with the map data based on alpha_3_code
+merged_data <- merge(world_map, data, by.x = "region", by.y = "alpha_3_code", all.x = TRUE)
+
+# Create the plot
+ggplot(data = merged_data, aes(x = long, y = lat, group = group, fill = population)) +
+  geom_polygon() +
+  scale_fill_gradient(low = "black", high = "red", na.value = "gray") +
+  theme_void()
+
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# read data from CSV file
+data <- read.csv("unicef_metadata1.csv")
+
+# filter data for India
+india_data <- filter(data, country == "India")
+
+# scatter plot with linear regression line for India
+india_plot <- ggplot(india_data, aes(x = population, y = gdp)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Population vs. GDP for India",
+       x = "Population", y = "GDP")
+
+# scatter plot of GDP vs. Life Expectancy
+gdp_le_plot <- ggplot(data, aes(x = life_expectancy, y = gdp)) +
+  geom_point() +
+  labs(title = "GDP vs. Life Expectancy",
+       x = "Life Expectancy", y = "GDP")
+
+# print the plots
+india_plot
+gdp_le_plot
+
+```
+
+```{r}
+
+library(rmarkdown)
+
+# Load data
+unicef_data <- read.csv("unicef_metadata1.csv")
+
+# Define input parameters
+params <- list(
+  country = "India",
+  start_year = 2000,
+  end_year = 2020
+)
+
+# Filter data based on input parameters
+data_country <- unicef_data %>%
+  filter(
+    country == params$country,
+    year >= params$start_year,
+    year <= params$end_year
+  )
+
+# Create a scatter plot of population and life expectancy
+ggplot(data_country, aes(x = population, y = life)) +
+  geom_point() +
+  ggtitle(paste0(params$country, " (", params$start_year, "-", params$end_year, ")"))
+
+```
+

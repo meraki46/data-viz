@@ -1,0 +1,73 @@
+---
+title: "milind-pari"
+author: "Deeksha Lokesh"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+
+```{r}
+data_1=read.csv("unicef_indicator_1.csv")[,c("country","indicator","time_period","obs_value","sex","current_age")]
+data_2=read.csv("unicef_indicator_2.csv")[,c("country","indicator","time_period","obs_value","sex","current_age")]
+data_meta=read.csv("unicef_metadata.csv")[,c("country","year","Population..total","GDP.per.capita..constant.2015.US..","GNI..current.US..","Inflation..consumer.prices..annual...","Life.expectancy.at.birth..total..years.")]
+dim(data_meta)
+```
+
+```{r}
+data=rbind(data_1,data_2)
+dim(data)
+```
+```{r}
+for(i in 1:length(names(data_meta))){
+  print(paste("column",i,length(which(is.na(data_meta[,i])==TRUE))))
+}
+
+```
+
+
+```{r}
+for(i in 1:length(names(data))){
+  print(paste("column",i,length(which(is.na(data[,i])==TRUE))))
+}
+
+```
+
+```{r}
+report=function(){
+  
+  #data-2 sex and time period bar-plot
+  
+  #pie
+  
+  #Year and life expect
+}
+```
+
+```{r}
+#year and life expectancy
+plot(data_meta[data_meta$country=="Afghanistan","year"],
+data_meta[data_meta$country=="Afghanistan","Life.expectancy.at.birth..total..years."],type="l")
+
+```
+
+```{r}
+plot(
+data_meta[data_meta$country=="Afghanistan","year"],
+data_meta[data_meta$country=="Afghanistan","Population..total"]
+,type = "l")
+```
+
+```{r}
+plot(
+data_meta[data_meta$country=="Afghanistan","year"],
+data_meta[data_meta$country=="Afghanistan","GDP.per.capita..constant.2015.US.."]
+,type = "l")
+#data_meta$GDP.per.capita..constant.2015.US..
+```
+
+
+```{r}
+pie(table(data$sex))
+
+```
+
