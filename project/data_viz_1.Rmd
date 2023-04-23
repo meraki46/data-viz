@@ -1,0 +1,261 @@
+---
+title: "MT5000 Assignment"
+format: html
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+## Quarto
+
+This is my assignment for MT5000 Module. 
+
+
+
+
+
+```{r}
+library(png)
+
+# Read PNG image file
+image <- readPNG("unicef.png")
+
+# Display the image
+plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1), xaxt = "n", yaxt = "n", ann = FALSE)
+rasterImage(image, 0, 0, 1, 1)
+
+
+```
+
+```{r}
+# Load required packages
+library(plotly)
+library(readr)
+
+# Read the CSV file into a data frame
+data <- read_csv("unicef_metadata1.csv")
+
+# Create an interactive world map with plotly
+plot_ly(data, type = "scattergeo", 
+        locations = ~alpha_3_code, 
+        hoverinfo = "text", 
+        text = ~paste("Country: ", country, "<br>",
+                      "Population: ", population, "<br>",
+                      "GDP: $", gdp, "<br>",
+                      "Inflation: ", inflation, "%"), 
+        marker = list(size = 10, color = "blue")) %>%
+  layout(title = "Interactive World Map", 
+         geo = list(showcountries = TRUE))
+
+
+```
+
+## Scatter Plot for India
+
+This below Life expectancy and GDP scatter plot analyses the relationship between a country's economic prosperity and its citizens' life expectancy.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# read data from CSV file
+data <- read.csv("unicef_metadata1.csv")
+
+# filter data for India
+india_data <- filter(data, country == "India")
+
+# scatter plot with linear regression line for India
+india_plot <- ggplot(india_data, aes(x = population, y = gdp)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Population vs. GDP for India",
+       x = "Population", y = "GDP")
+
+# scatter plot of GDP vs. Life Expectancy
+gdp_le_plot <- ggplot(data, aes(x = life, y = gdp)) +
+  geom_point() +
+  labs(title = "GDP vs. Life Expectancy",
+       x = "Life Expectancy", y = "GDP")
+
+# print the plots
+india_plot
+gdp_le_plot
+
+```
+## Grouped Scatter plot with marginal density plots for India
+
+```{r}
+library(ggpubr)
+
+# Load data from CSV file
+data <- read.csv("unicef_metadata1.csv")
+
+# Filter data for India
+india_data <- filter(data, country == "India")
+
+# Grouped Scatter plot with marginal density plots for India
+ggscatterhist(
+  india_data, x = "population", y = "life", color = "gdp",
+  size = 3, alpha = 0.6, margin.params = list(fill = "gdp", color = "black", size = 0.2)
+)
+
+```
+
+
+
+
+```{r}
+library(ggpubr)
+library(dplyr)
+
+# Load data
+unicef_data <- read.csv("unicef_indicator_2.csv")
+
+# Choose a specific country
+selected_country <- "India"
+data_country <- unicef_data %>% filter(country == selected_country)
+
+# Grouped Scatter plot with marginal density plots for sex column
+ggscatterhist(
+  data_country, x = "time_period", y = "obs_value",
+  color = "sex", size = 3, alpha = 0.6,
+  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+  margin.params = list(fill = "sex", color = "black", size = 0.2)
+)
+
+
+```
+## Scatter plot by density for Bhutan
+
+```{r}
+library(ggpubr)
+library(dplyr)
+
+# Load data
+unicef_data <- read.csv("unicef_indicator_2.csv")
+
+# Choose a specific country
+selected_country <- "India"
+data_country <- unicef_data %>% filter(country == selected_country)
+
+# Filter the data to show only male and female values
+data_country <- data_country %>% filter(sex %in% c("Male", "Female"))
+
+# Grouped Scatter plot with marginal density plots for sex column
+ggscatterhist(
+  data_country, x = "time_period", y = "obs_value",
+  color = "sex", size = 3, alpha = 0.6,
+  palette = c("#00AFBB", "#E7B800"),
+  margin.params = list(fill = "sex", color = "black", size = 0.2)
+)
+
+```
+
+
+
+
+
+
+## Top 10 countires by GDP in 2020
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Load data
+unicef_data <- read.csv("unicef_metadata1.csv")
+
+# Select the top 10 countries based on GDP
+top_gdp <- unicef_data %>%
+  filter(year == 2020) %>%
+  arrange(desc(gdp)) %>%
+  head(10)
+
+# Create the Lollipop chart
+ggplot(top_gdp, aes(x = reorder(country, -gdp), y = gdp, color = country)) +
+  geom_segment(aes(xend = country, yend = 0)) +
+  geom_point(size = 3) +
+  scale_color_discrete(guide = FALSE ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(title = "Top 10 countries by GDP in 2020", x = "Country", y = "GDP (in billions)")
+
+```
+
+
+# Grouped Scatter plot with marginal density plots for sex column
+
+```{r}
+library(ggpubr)
+library(dplyr)
+
+# Load data
+unicef_data <- read.csv("unicef_indicator_2.csv")
+
+# Choose specific countries
+selected_countries <- c("Bhutan", "India", "Albania")
+data_countries <- unicef_data %>% filter(country %in% selected_countries)
+
+# Grouped Scatter plot with marginal density plots for sex column
+ggscatterhist(
+  data_countries, x = "time_period", y = "obs_value",
+  color = "sex", size = 3, alpha = 0.6,
+  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+  margin.params = list(fill = "sex", color = "black", size = 0.2)
+)
+
+```
+
+## Time Series plot for India
+This below plot shows the India's population trend over the years. 
+
+
+```{r}
+# Load the necessary libraries
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Load the data from the CSV file
+data <- read.csv("unicef_metadata1.csv")
+
+# Filter the data to only include India
+india_data <- filter(data, country == "India")
+
+# Create the line chart
+ggplot(india_data, aes(x = year)) +
+  geom_line(aes(y = population, color = "Population")) +
+  scale_color_manual(values = c("Population" = "red")) +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Trends in Population, and GNI in Bhutan",
+       x = "Year",
+       y = "Value") +
+  theme_minimal()
+
+```
+
+
+## Scatter Plot for Australia
+
+```{r}
+library(ggplot2)
+
+# Load data
+data <- read.csv("unicef_metadata1.csv")
+
+# Filter data for Australia only
+aus_data <- data[data$country == "India",]
+
+# Create scatterplot with linear regression line
+ggplot(aus_data, aes(x = gdp, y = inflation)) +
+  geom_point(aes(color = "GDP"), size = 3) +
+  geom_smooth(aes(color = "Inflation"), method = "lm", se = FALSE) +
+  scale_color_manual(name = "Variable", values = c("GDP" = "orange", "Inflation" = "green")) +
+  labs(title = "Inflation vs. GDP for Australia",
+       x = "GDP", y = "Inflation")
+
+```
+
+
+
