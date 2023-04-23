@@ -1,6 +1,10 @@
 ---
 title: "MT5000 Assignment"
 format: html
+runtime: shiny
+output:
+  html_document:
+    runtime: shiny
 execute: 
   echo: false
   warning: false
